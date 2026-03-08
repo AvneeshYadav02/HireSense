@@ -1,0 +1,37 @@
+{% extends "admin/admin_base.html" %}
+{% block title %} – Blacklisted Users{% endblock %}
+
+{% block admin_content %}
+<h1>Blacklisted Users</h1>
+
+{% if users %}
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for user in users %}
+        <tr>
+            <td>{{ user.id }}</td>
+            <td>{{ user.username }}</td>
+            <td>{{ user.email }}</td>
+            <td>{{ user.role }}</td>
+            <td>
+                <form method="POST" action="{{ url_for('admin.whitelist_user', user_id=user.id) }}">
+                    <button type="submit">Whitelist</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No blacklisted users.</p>
+{% endif %}
+{% endblock %}

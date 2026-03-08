@@ -8,11 +8,7 @@ db = SQLAlchemy()
 login_manager = LoginManager()
 migrate = Migrate()
 
-PORT_COOKIES = {
-    5010: "hs_session_5010",
-    5011: "hs_session_5011",
-    5012: "hs_session_5012",
-}
+PORT_COOKIES = {5010: "hs_session_5010", 5011: "hs_session_5011", 5012: "hs_session_5012"}
 
 
 def create_app(port: int = 5010) -> Flask:
@@ -36,8 +32,14 @@ def create_app(port: int = 5010) -> Flask:
 
     from .auth import auth_bp
     from .views import views_bp
+    from .admin import admin_bp
+    from .manager import manager_bp
+    from .employee import employee_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(views_bp)
+    app.register_blueprint(admin_bp)
+    app.register_blueprint(manager_bp)
+    app.register_blueprint(employee_bp)
 
     return app

@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+<nav>
+    <ul>
+        <li><a href="{{ url_for('admin.dashboard') }}">Dashboard</a></li>
+        <li><a href="{{ url_for('admin.manage_users') }}">Manage Users</a></li>
+        <li><a href="{{ url_for('admin.reset_credentials') }}">Reset Credentials</a></li>
+        <li><a href="{{ url_for('admin.blacklisted_users') }}">Blacklisted Users</a></li>
+    </ul>
+</nav>
+<hr>
+{% block admin_content %}{% endblock %}
+{% endblock %}

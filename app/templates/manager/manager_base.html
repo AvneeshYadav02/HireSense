@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block content %}
+<nav>
+    <ul>
+        <li><a href="{{ url_for('manager.dashboard') }}">Dashboard</a></li>
+    </ul>
+</nav>
+<hr>
+{% block manager_content %}{% endblock %}
+{% endblock %}
