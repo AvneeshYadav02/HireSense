@@ -1,7 +1,7 @@
 {% extends "admin/admin_base.html" %}
 {% block title %} – Manage Users{% endblock %}
 
-{% block admin_content %}
+{% block admin_content %}<div class="px-6 pb-6">
 <h1>Manage Users</h1>
 
 {% if users %}
@@ -22,7 +22,7 @@
         {% for user in users %}
         <tr>
             <td>{{ user.id }}</td>
-            <td>{{ user.username }}</td>
+            <td class="flex items-center gap-2"><img src="https://api.dicebear.com/9.x/identicon/svg?seed={{ user.username }}" class="w-6 h-6 rounded-full" />{{ user.username }}</td>
             <td>{{ user.email }}</td>
             <td>{{ user.role }}</td>
             <td>{{ "Yes" if user.is_active else "No" }}</td>
@@ -49,4 +49,5 @@
 {% else %}
 <p>No users found.</p>
 {% endif %}
-{% endblock %}
+</div>{% endblock %}
+

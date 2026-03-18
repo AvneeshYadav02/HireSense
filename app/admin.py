@@ -4,7 +4,7 @@ from flask import Blueprint, abort, flash, redirect, render_template, request, u
 from flask_login import current_user, login_required
 
 from . import db
-from .models import User
+from .models import User, Notification
 
 admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
 
@@ -19,12 +19,42 @@ def admin_required(f):
     return decorated
 
 
+def notify_admin(message: str, type: str = "info"):
+    try:
+        new_notification = Notification(user_id=current_user.id, message=message, type=type)
+        db.session.add(new_notification)
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+
+
+@admin_bp.context_processor
+def inject_notifications():
+    if current_user.is_authenticated and current_user.role == "admin":
+        notifs = Notification.query.filter_by(user_id=current_user.id).order_by(Notification.created_at.desc()).limit(15).all()
+        unread_count = sum(1 for n in notifs if not n.is_read)
+        
+        if unread_count > 0:
+            for n in notifs:
+                n.is_read = True
+            db.session.commit()
+            
+        return {"admin_notifications": notifs, "admin_unread_count": unread_count}
+    return {}
+
+
 @admin_bp.route("/")
 @admin_required
 def dashboard():
-    pending_users = User.query.filter_by(is_approved=False, is_blacklisted=False).all()
+    search_query = request.args.get("q", "").strip()
+    
+    query = User.query.filter_by(is_approved=False, is_blacklisted=False)
+    if search_query:
+        query = query.filter((User.username.ilike(f"%{search_query}%")) | (User.email.ilike(f"%{search_query}%")))
+        
+    pending_users = query.all()
     total_users = User.query.filter_by(is_approved=True, is_blacklisted=False).count()
-    return render_template("admin/dashboard.html", pending_users=pending_users, total_users=total_users, active_page="Dashboard")
+    return render_template("admin/dashboard.html", pending_users=pending_users, total_users=total_users, active_page="Dashboard", search_query=search_query)
 
 
 @admin_bp.route("/approve/<int:user_id>", methods=["POST"])
@@ -35,7 +65,7 @@ def approve_user(user_id):
         abort(404)
     user.is_approved = True
     db.session.commit()
-    flash(f"User '{user.username}' has been approved.", "success")
+    notify_admin(f"User '{user.username}' has been approved.", "success")
     return redirect(url_for("admin.dashboard"))
 
 
@@ -47,7 +77,7 @@ def reject_user(user_id):
         abort(404)
     db.session.delete(user)
     db.session.commit()
-    flash(f"User '{user.username}' registration has been rejected.", "success")
+    notify_admin(f"User '{user.username}' registration has been rejected.", "success")
     return redirect(url_for("admin.dashboard"))
 
 
@@ -65,7 +95,7 @@ def edit_user(user_id):
     if user is None:
         abort(404)
     if user.id == current_user.id:
-        flash("You cannot edit your own account from here.", "danger")
+        notify_admin("You cannot edit your own account from here.", "danger")
         return redirect(url_for("admin.manage_users"))
 
     if request.method == "POST":
@@ -74,17 +104,17 @@ def edit_user(user_id):
         new_role = request.form.get("role", "employee")
 
         if new_role not in ("employee", "manager", "admin"):
-            flash("Invalid role.", "danger")
+            notify_admin("Invalid role.", "danger")
             return render_template("admin/edit_user.html", user=user)
 
         existing = User.query.filter(User.username == new_username, User.id != user.id).first()
         if existing:
-            flash("Username already taken.", "danger")
+            notify_admin("Username already taken.", "danger")
             return render_template("admin/edit_user.html", user=user)
 
         existing = User.query.filter(User.email == new_email, User.id != user.id).first()
         if existing:
-            flash("Email already in use.", "danger")
+            notify_admin("Email already in use.", "danger")
             return render_template("admin/edit_user.html", user=user)
 
         user.username = new_username
@@ -93,7 +123,7 @@ def edit_user(user_id):
         user.is_active = "is_active" in request.form
         user.is_approved = "is_approved" in request.form
         db.session.commit()
-        flash(f"User '{user.username}' updated.", "success")
+        notify_admin(f"User '{user.username}' updated.", "success")
         return redirect(url_for("admin.manage_users"))
 
     return render_template("admin/edit_user.html", user=user)
@@ -106,12 +136,12 @@ def delete_user(user_id):
     if user is None:
         abort(404)
     if user.id == current_user.id:
-        flash("You cannot delete your own account.", "danger")
+        notify_admin("You cannot delete your own account.", "danger")
         return redirect(url_for("admin.manage_users"))
     username = user.username
     db.session.delete(user)
     db.session.commit()
-    flash(f"User '{username}' has been deleted.", "success")
+    notify_admin(f"User '{username}' has been deleted.", "success")
     return redirect(url_for("admin.manage_users"))
 
 
@@ -122,12 +152,12 @@ def blacklist_user(user_id):
     if user is None:
         abort(404)
     if user.id == current_user.id:
-        flash("You cannot blacklist yourself.", "danger")
+        notify_admin("You cannot blacklist yourself.", "danger")
         return redirect(url_for("admin.manage_users"))
     user.is_blacklisted = True
     user.is_active = False
     db.session.commit()
-    flash(f"User '{user.username}' has been blacklisted.", "success")
+    notify_admin(f"User '{user.username}' has been blacklisted.", "success")
     return redirect(url_for("admin.manage_users"))
 
 
@@ -151,11 +181,11 @@ def do_reset_password(user_id):
         abort(404)
     new_password = request.form.get("new_password", "")
     if len(new_password) < 6:
-        flash("Password must be at least 6 characters.", "danger")
+        notify_admin("Password must be at least 6 characters.", "danger")
         return redirect(url_for("admin.reset_credentials", q=user.username))
     user.set_password(new_password)
     db.session.commit()
-    flash(f"Password for '{user.username}' has been reset.", "success")
+    notify_admin(f"Password for '{user.username}' has been reset.", "success")
     return redirect(url_for("admin.reset_credentials", q=user.username))
 
 
@@ -167,7 +197,7 @@ def force_logout(user_id):
         abort(404)
     user.is_active = False
     db.session.commit()
-    flash(f"User '{user.username}' has been force-logged out (account deactivated). Re-activate via Manage Users.", "success")
+    notify_admin(f"User '{user.username}' has been force-logged out (account deactivated). Re-activate via Manage Users.", "success")
     return redirect(url_for("admin.reset_credentials", q=user.username))
 
 
@@ -187,5 +217,5 @@ def whitelist_user(user_id):
     user.is_blacklisted = False
     user.is_active = True
     db.session.commit()
-    flash(f"User '{user.username}' has been whitelisted.", "success")
+    notify_admin(f"User '{user.username}' has been whitelisted.", "success")
     return redirect(url_for("admin.blacklisted_users"))

@@ -1,7 +1,7 @@
 {% extends "admin/admin_base.html" %}
 {% block title %} – Blacklisted Users{% endblock %}
 
-{% block admin_content %}
+{% block admin_content %}<div class="px-6 pb-6">
 <h1>Blacklisted Users</h1>
 
 {% if users %}
@@ -19,7 +19,7 @@
         {% for user in users %}
         <tr>
             <td>{{ user.id }}</td>
-            <td>{{ user.username }}</td>
+            <td class="flex items-center gap-2"><img src="https://api.dicebear.com/9.x/identicon/svg?seed={{ user.username }}" class="w-6 h-6 rounded-full" />{{ user.username }}</td>
             <td>{{ user.email }}</td>
             <td>{{ user.role }}</td>
             <td>
@@ -34,4 +34,5 @@
 {% else %}
 <p>No blacklisted users.</p>
 {% endif %}
-{% endblock %}
+</div>{% endblock %}
+
