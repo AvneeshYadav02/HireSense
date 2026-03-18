@@ -1,7 +1,7 @@
 {% extends "admin/admin_base.html" %}
 {% block title %} – Edit User{% endblock %}
 
-{% block admin_content %}
+{% block admin_content %}<div class="px-6 pb-6">
 <h1>Edit User: {{ user.username }}</h1>
 
 <form method="POST">
@@ -38,4 +38,4 @@
         <a href="{{ url_for('admin.manage_users') }}">Cancel</a>
     </div>
 </form>
-{% endblock %}
+</div>{% endblock %}
