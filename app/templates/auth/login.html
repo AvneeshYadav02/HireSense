@@ -28,22 +28,22 @@
 {% endblock %}
 
 {% block auth_content %}
-<h1 class="text-4xl text-black font-bold tracking-tighter mb-8 text-left">Sign In</h1>
+<h1 class="text-4xl text-text-main font-bold tracking-tighter mb-8 text-left">Sign In</h1>
 
 <form method="POST" class="w-full max-w-md">
     <div class="mb-6">
         <label class="text-xl font-bold block mb-2">Email Address</label>
         <input name="email" type="email" placeholder="someone@example.com" required autofocus
-            class="text-xl w-full px-4 py-3 rounded-md border border-gray-300 focus:border-green-800 outline-none transition-colors">
+            class="text-xl w-full px-4 py-3 rounded-md border border-border-main focus:border-primary-800 outline-none transition-colors">
     </div>
 
     <div class="mb-4">
         <label class="text-xl font-bold block mb-2">Password</label>
         <div class="relative">
             <input id="login-pw" name="password" type="password" placeholder="Password" required
-                class="text-xl w-full px-4 py-3 pr-14 rounded-md border border-gray-300 focus:border-green-800 outline-none transition-colors">
+                class="text-xl w-full px-4 py-3 pr-14 rounded-md border border-border-main focus:border-primary-800 outline-none transition-colors">
             <button type="button" onclick="togglePw('login-pw', this)"
-                class="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-md text-gray-400 hover:text-green-800 hover:bg-green-50 transition-colors duration-150 focus:outline-none"
+                class="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-md text-text-light hover:text-primary-800 hover:bg-primary-50 transition-colors duration-150 focus:outline-none"
                 aria-label="Toggle password visibility">
                 <!-- Eye (password hidden) -->
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
@@ -63,17 +63,17 @@
     </div>
 
     <div class="flex justify-between items-center mb-8">
-        <a href="#" class="text-sm text-green-800 hover:underline">Forgot Password?</a>
+        <a href="#" class="text-sm text-primary-800 hover:underline">Forgot Password?</a>
     </div>
 
     <button type="submit"
-        class="text-xl w-full py-3 mb-6 rounded-md bg-green-950 text-white font-bold hover:bg-green-700 transition-colors shadow-sm">
+        class="text-xl w-full py-3 mb-6 rounded-md bg-primary-950 text-text-inverse font-bold hover:bg-primary-700 transition-colors shadow-sm">
         Sign In
     </button>
 
     <p class="text-center">
-        <span class="text-sm text-gray-600">Don't have an account? </span>
-        <a href="{{ url_for('auth.register') }}" class="text-sm text-green-800 font-semibold hover:underline">Register
+        <span class="text-sm text-text-muted">Don't have an account? </span>
+        <a href="{{ url_for('auth.register') }}" class="text-sm text-primary-800 font-semibold hover:underline">Register
             Now</a>
     </p>
 </form>

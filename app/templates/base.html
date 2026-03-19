@@ -2,54 +2,95 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HireSense{% block title %}{% endblock %}</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HireSense{% block title %}{% endblock %}</title>
 
-  <!-- Tailwind CSS via browser CDN (v4) -->
-  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- Tailwind CSS via browser CDN (v4) -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 
-  <!-- Tailwind theme config -->
-  <style type="text/tailwindcss">
-    @theme {
+    <!-- Tailwind theme config -->
+    <style type="text/tailwindcss">
+        @theme {
       --font-sans: 'Roboto', ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+
+      /* Semantic Primary Color (Mapping to Green) */
+      --color-primary-50: var(--color-green-50);
+      --color-primary-100: var(--color-green-100);
+      --color-primary-200: var(--color-green-200);
+      --color-primary-300: var(--color-green-300);
+      --color-primary-400: var(--color-green-400);
+      --color-primary-500: var(--color-green-500);
+      --color-primary-600: var(--color-green-600);
+      --color-primary-700: var(--color-green-700);
+      --color-primary-800: var(--color-green-800);
+      --color-primary-900: var(--color-green-900);
+      --color-primary-950: var(--color-green-950);
+
+      /* Semantic Layout Colors */
+      --color-background: var(--color-gray-100);
+      --color-surface: var(--color-white);
+
+      /* Semantic Text Colors */
+      --color-text-main: var(--color-gray-900);
+      --color-text-muted: var(--color-gray-600);
+      --color-text-light: var(--color-gray-400);
+      --color-text-inverse: var(--color-white);
+
+      /* Semantic Border */
+      --color-border-main: var(--color-gray-300);
+
+      /* Semantic Alerts */
+      --color-danger-50: var(--color-red-50);
+      --color-danger-200: var(--color-red-200);
+      --color-danger-800: var(--color-red-800);
+
+      --color-success-50: var(--color-green-50);
+      --color-success-200: var(--color-green-200);
+      --color-success-800: var(--color-green-800);
+
+      --color-info-50: var(--color-blue-50);
+      --color-info-200: var(--color-blue-200);
+      --color-info-800: var(--color-blue-800);
     }
   </style>
 
-  <!-- Google Fonts – Roboto -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
-    rel="stylesheet">
-  <link
-    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
-    rel="stylesheet" />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
-    rel="stylesheet" />
+    <!-- Google Fonts – Roboto -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
 
-  {% block head_extra %}{% endblock %}
+    {% block head_extra %}{% endblock %}
 </head>
 
-<body class="font-sans antialiased text-gray-900 bg-gray-100 {% block body_class %}{% endblock %}">
+<body class="font-sans antialiased text-text-main bg-background {% block body_class %}{% endblock %}">
 
-  {% with messages = get_flashed_messages(with_categories=true) %}
-  {% if messages %}
-  <div class="fixed top-5 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-3 w-full max-w-md px-4">
-    {% for category, message in messages %}
-    {% set alertColor = 'bg-red-50 text-red-800 border-red-200' if category == 'danger' else ('bg-green-50
-    text-green-800 border-green-200' if category == 'success' else 'bg-blue-50 text-blue-800 border-blue-200') %}
-    <div class="px-4 py-3 rounded-lg border shadow-lg {{ alertColor }} flex items-center justify-between" role="alert">
-      <span class="font-medium">{{ message }}</span>
-      <button onclick="this.parentElement.remove()"
-        class="opacity-60 hover:opacity-100 text-lg leading-none focus:outline-none ml-4">&times;</button>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="fixed top-5 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-3 w-full max-w-md px-4">
+        {% for category, message in messages %}
+        {% set alertColor = 'bg-danger-50 text-danger-800 border-danger-200' if category == 'danger' else
+        ('bg-success-50 text-success-800 border-success-200' if category == 'success' else 'bg-info-50 text-info-800
+        border-info-200') %}
+        <div class="px-4 py-3 rounded-lg border shadow-lg {{ alertColor }} flex items-center justify-between"
+            role="alert">
+            <span class="font-medium">{{ message }}</span>
+            <button onclick="this.parentElement.remove()"
+                class="opacity-60 hover:opacity-100 text-lg leading-none focus:outline-none ml-4">&times;</button>
+        </div>
+        {% endfor %}
     </div>
-    {% endfor %}
-  </div>
-  {% endif %}
-  {% endwith %}
+    {% endif %}
+    {% endwith %}
 
-  {% block content %}{% endblock %}
+    {% block content %}{% endblock %}
 </body>
 
 </html>

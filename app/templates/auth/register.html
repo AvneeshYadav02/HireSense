@@ -28,28 +28,28 @@
 {% endblock %}
 
 {% block auth_content %}
-<h1 class="text-4xl text-black font-bold tracking-tighter mb-8 text-left">Register</h1>
+<h1 class="text-4xl text-text-main font-bold tracking-tighter mb-8 text-left">Register</h1>
 
 <form method="POST" class="w-full max-w-md">
     <div class="mb-6">
         <label class="text-xl font-bold block mb-2">Username</label>
         <input name="username" type="text" placeholder="Username" required
-            class="text-xl w-full px-4 py-3 rounded-md border border-gray-300 focus:border-green-800 outline-none transition-colors">
+            class="text-xl w-full px-4 py-3 rounded-md border border-border-main focus:border-primary-800 outline-none transition-colors">
     </div>
 
     <div class="mb-4">
         <label class="text-xl font-bold block mb-2">Email Address</label>
         <input name="email" type="email" placeholder="name@company.com" required
-            class="text-xl w-full px-4 py-3 rounded-md border border-gray-300 focus:border-green-800 outline-none transition-colors">
+            class="text-xl w-full px-4 py-3 rounded-md border border-border-main focus:border-primary-800 outline-none transition-colors">
     </div>
 
     <div class="mb-6">
         <label class="text-xl font-bold block mb-2">Password</label>
         <div class="relative">
             <input id="reg-pw" name="password" type="password" placeholder="Password" required
-                class="text-xl w-full px-4 py-3 pr-14 rounded-md border border-gray-300 focus:border-green-800 outline-none transition-colors">
+                class="text-xl w-full px-4 py-3 pr-14 rounded-md border border-border-main focus:border-primary-800 outline-none transition-colors">
             <button type="button" onclick="togglePw('reg-pw', this)"
-                class="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-md text-gray-400 hover:text-green-800 hover:bg-green-50 transition-colors duration-150 focus:outline-none"
+                class="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-md text-text-light hover:text-primary-800 hover:bg-primary-50 transition-colors duration-150 focus:outline-none"
                 aria-label="Toggle password visibility">
                 <!-- Eye (password hidden) -->
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
@@ -74,12 +74,12 @@
             <div class="flex gap-2">
                 <input type="radio" name="role" id="role_manager" value="manager" class="sr-only peer/manager" checked>
                 <label for="role_manager"
-                    class="px-5 py-2 rounded-full border-2 border-green-950 text-green-950 font-semibold cursor-pointer select-none transition-all duration-200 peer-checked/manager:bg-green-950 peer-checked/manager:text-white hover:bg-green-100 peer-checked/manager:hover:bg-green-900">
+                    class="px-5 py-2 rounded-full border-2 border-primary-950 text-primary-950 font-semibold cursor-pointer select-none transition-all duration-200 peer-checked/manager:bg-primary-950 peer-checked/manager:text-text-inverse hover:bg-primary-100 peer-checked/manager:hover:bg-primary-900">
                     Manager
                 </label>
                 <input type="radio" name="role" id="role_employee" value="employee" class="sr-only peer/employee">
                 <label for="role_employee"
-                    class="px-5 py-2 rounded-full border-2 border-green-950 text-green-950 font-semibold cursor-pointer select-none transition-all duration-200 peer-checked/employee:bg-green-950 peer-checked/employee:text-white hover:bg-green-100 peer-checked/employee:hover:bg-green-900">
+                    class="px-5 py-2 rounded-full border-2 border-primary-950 text-primary-950 font-semibold cursor-pointer select-none transition-all duration-200 peer-checked/employee:bg-primary-950 peer-checked/employee:text-text-inverse hover:bg-primary-100 peer-checked/employee:hover:bg-primary-900">
                     Employee
                 </label>
             </div>
@@ -87,13 +87,13 @@
     </div>
 
     <button type="submit"
-        class="text-xl w-full py-3 mb-6 rounded-md bg-green-950 text-white font-bold hover:bg-green-700 transition-colors shadow-sm">
+        class="text-xl w-full py-3 mb-6 rounded-md bg-primary-950 text-text-inverse font-bold hover:bg-primary-700 transition-colors shadow-sm">
         Register
     </button>
 
     <p class="text-center">
-        <span class="text-sm text-gray-600">Already have an account? </span>
-        <a href="{{ url_for('auth.login') }}" class="text-sm text-green-800 font-semibold hover:underline">Log In</a>
+        <span class="text-sm text-text-muted">Already have an account? </span>
+        <a href="{{ url_for('auth.login') }}" class="text-sm text-primary-800 font-semibold hover:underline">Log In</a>
     </p>
 </form>
 
