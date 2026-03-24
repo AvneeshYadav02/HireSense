@@ -1,11 +1,32 @@
 {% extends "base.html" %}
 
 {% block content %}
-<nav>
-    <ul>
-        <li><a href="{{ url_for('manager.dashboard') }}">Dashboard</a></li>
-    </ul>
+<nav style="background-color: #f8f9fa; padding: 10px; margin-bottom: 20px;">
+    <strong>Manager Portal</strong> |
+    <a href="{{ url_for('manager.dashboard') }}">Dashboard</a> |
+    <a href="{{ url_for('manager.list_projects') }}">Projects</a> |
+    <a href="{{ url_for('manager.view_updates') }}">Updates</a> |
+    <a href="{{ url_for('manager.profile') }}">My Profile</a> |
+    <a href="{{ url_for('manager.my_skills') }}">My Skills</a> |
+    <a href="{{ url_for('manager.learning_paths') }}">Learning Paths</a> |
+    <a href="{{ url_for('manager.compare_roles') }}">Compare Roles</a> |
+    <a href="{{ url_for('auth.logout') }}">Logout</a>
 </nav>
-<hr>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+<div style="margin-bottom: 15px;">
+    {% for category, message in messages %}
+    <div style="padding: 10px; margin-bottom: 5px; border: 1px solid;
+        {% if category == 'success' %}background-color: #d4edda; border-color: #28a745;
+        {% elif category == 'danger' %}background-color: #f8d7da; border-color: #dc3545;
+        {% else %}background-color: #d1ecf1; border-color: #17a2b8;{% endif %}">
+        {{ message }}
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endwith %}
+
 {% block manager_content %}{% endblock %}
 {% endblock %}

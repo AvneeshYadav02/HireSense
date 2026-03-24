@@ -1,0 +1,59 @@
+{% extends "manager/manager_base.html" %}
+{% block title %} – My Profile{% endblock %}
+
+{% block manager_content %}
+<h1>My Profile</h1>
+
+<table border="1" cellpadding="10">
+    <tr>
+        <td><strong>Username</strong></td>
+        <td>{{ user.username }}</td>
+    </tr>
+    <tr>
+        <td><strong>Email</strong></td>
+        <td>{{ user.email }}</td>
+    </tr>
+    <tr>
+        <td><strong>Role</strong></td>
+        <td>{{ user.role }}</td>
+    </tr>
+    <tr>
+        <td><strong>Department</strong></td>
+        <td>{{ user.department.name if user.department else 'Not assigned' }}</td>
+    </tr>
+    <tr>
+        <td><strong>Job Title</strong></td>
+        <td>{{ user.job_title or 'Not set' }}</td>
+    </tr>
+    <tr>
+        <td><strong>Member Since</strong></td>
+        <td>{{ user.created_at.strftime('%Y-%m-%d') }}</td>
+    </tr>
+</table>
+
+<h2>My Skills ({{ skills|length }})</h2>
+{% if skills %}
+<ul>
+    {% for skill in skills[:5] %}
+    <li>{{ skill.skill_name }} - Level {{ skill.proficiency_level }}/5 {{ '(Verified)' if skill.is_verified else '' }}
+    </li>
+    {% endfor %}
+    {% if skills|length > 5 %}
+    <li><a href="{{ url_for('manager.my_skills') }}">...and {{ skills|length - 5 }} more</a></li>
+    {% endif %}
+</ul>
+{% else %}
+<p>No skills added. <a href="{{ url_for('manager.my_skills') }}">Add skills</a></p>
+{% endif %}
+
+<h2>Active Learning Path</h2>
+{% if active_path %}
+<p>
+    <strong>Target Role:</strong> {{ active_path.target_role }}<br>
+    <strong>Status:</strong> {{ active_path.status }}<br>
+    <a href="{{ url_for('manager.view_learning_path', path_id=active_path.id) }}">View Details</a>
+</p>
+{% else %}
+<p>No active learning path. <a href="{{ url_for('manager.learning_paths') }}">Generate one</a></p>
+{% endif %}
+{% endblock %}

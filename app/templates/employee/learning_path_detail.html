@@ -1,0 +1,88 @@
+{% extends "employee/employee_base.html" %}
+{% block title %} – Learning Path Details{% endblock %}
+
+{% block employee_content %}
+<h1>Learning Path: {{ content.target_role_title or path.target_role }}</h1>
+
+<p><a href="{{ url_for('employee.learning_paths') }}">&larr; Back to Learning Paths</a></p>
+
+<table border="1" cellpadding="8">
+    <tr>
+        <td><strong>Target Role</strong></td>
+        <td>{{ content.target_role_title or path.target_role }}</td>
+    </tr>
+    <tr>
+        <td><strong>Status</strong></td>
+        <td>{{ path.status }}</td>
+    </tr>
+    <tr>
+        <td><strong>Readiness Score</strong></td>
+        <td>{{ content.readiness_score }}%</td>
+    </tr>
+    <tr>
+        <td><strong>Skills to Learn</strong></td>
+        <td>{{ content.total_skills_to_learn }}</td>
+    </tr>
+    <tr>
+        <td><strong>Skills to Improve</strong></td>
+        <td>{{ content.skills_to_improve }}</td>
+    </tr>
+    <tr>
+        <td><strong>Generated</strong></td>
+        <td>{{ path.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+    </tr>
+</table>
+
+{% if path.status == 'active' %}
+<p>
+<form method="POST" action="{{ url_for('employee.complete_learning_path', path_id=path.id) }}" style="display: inline;">
+    <button type="submit" style="padding: 8px 16px; background: #28a745; color: white; border: none;">Mark as
+        Completed</button>
+</form>
+<form method="POST" action="{{ url_for('employee.archive_learning_path', path_id=path.id) }}"
+    style="display: inline; margin-left: 10px;">
+    <button type="submit" style="padding: 8px 16px; background: #6c757d; color: white; border: none;">Archive</button>
+</form>
+</p>
+{% endif %}
+
+<h2>Recommendations</h2>
+{% if content.recommendations %}
+<table border="1" cellpadding="8" style="width: 100%;">
+    <tr>
+        <th>Skill</th>
+        <th>Priority</th>
+        <th>Current Level</th>
+        <th>Target Level</th>
+        <th>Required</th>
+        <th>Resources</th>
+    </tr>
+    {% for rec in content.recommendations %}
+    <tr
+        style="{% if rec.priority == 'high' %}background-color: #f8d7da;{% elif rec.priority == 'medium' %}background-color: #fff3cd;{% else %}background-color: #d4edda;{% endif %}">
+        <td>{{ rec.skill_name }}</td>
+        <td>{{ rec.priority|upper }}</td>
+        <td>{{ rec.current_level }}/5</td>
+        <td>{{ rec.target_level }}/5</td>
+        <td>{{ 'Yes' if rec.is_required else 'No' }}</td>
+        <td>
+            {% for resource in rec.resources %}
+            <small>{{ resource.type }}: {{ resource.title }}</small><br>
+            {% endfor %}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+<p><small>Red = high priority, Yellow = medium, Green = low priority</small></p>
+{% else %}
+<p>No recommendations at this time.</p>
+{% endif %}
+
+<h2>Next Steps</h2>
+<ol>
+    <li>Review the skills marked as HIGH priority</li>
+    <li>Use the suggested resources to learn each skill</li>
+    <li>Update your skill profile as you learn</li>
+    <li>Compare your progress regularly</li>
+</ol>
+{% endblock %}

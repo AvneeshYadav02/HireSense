@@ -26,7 +26,7 @@ os.environ["ADMIN_PASSWORD"] = "TestAdmin@123"
 os.environ["FLASK_DEBUG"] = "false"
 
 from app import create_app, db
-from app.models import User, Notification
+from app.models import User, Notification, Department, Skill, Project, ProjectSkill, ProjectAssignment, UserSkill, Resume, LearningPath
 
 
 # Enable foreign key constraints for SQLite
@@ -302,3 +302,131 @@ def sample_notification(db_session, admin_user: User) -> Notification:
     db_session.add(notification)
     db_session.commit()
     return notification
+
+
+# ============================================
+# NEW FIXTURES FOR MANAGER/EMPLOYEE FEATURES
+# ============================================
+
+@pytest.fixture(scope="function")
+def department(db_session) -> Department:
+    """Create a sample department for testing."""
+    dept = Department(name="Engineering")
+    db_session.add(dept)
+    db_session.commit()
+    return dept
+
+
+@pytest.fixture(scope="function")
+def skills(db_session) -> list:
+    """Create sample skills for testing."""
+    skill_data = [
+        ("Python", "technical"),
+        ("JavaScript", "technical"),
+        ("SQL", "technical"),
+        ("Docker", "technical"),
+        ("AWS", "technical"),
+        ("Git", "technical"),
+        ("Communication", "soft"),
+        ("Project Management", "soft"),
+    ]
+    skills = []
+    for name, category in skill_data:
+        skill = Skill(name=name, category=category)
+        db_session.add(skill)
+        skills.append(skill)
+    db_session.commit()
+    return skills
+
+
+@pytest.fixture(scope="function")
+def project(db_session, manager_user: User) -> Project:
+    """Create a sample project for testing."""
+    proj = Project(
+        title="Test Project",
+        description="A test project for unit testing",
+        status="active",
+        manager_id=manager_user.id,
+    )
+    db_session.add(proj)
+    db_session.commit()
+    return proj
+
+
+@pytest.fixture(scope="function")
+def project_with_skills(db_session, project: Project, skills: list) -> Project:
+    """Create a project with skill requirements."""
+    # Add Python as mandatory, JavaScript as optional
+    ps1 = ProjectSkill(
+        project_id=project.id,
+        skill_id=skills[0].id,  # Python
+        is_mandatory=True,
+        minimum_proficiency=3,
+    )
+    ps2 = ProjectSkill(
+        project_id=project.id,
+        skill_id=skills[1].id,  # JavaScript
+        is_mandatory=False,
+        minimum_proficiency=2,
+    )
+    db_session.add_all([ps1, ps2])
+    db_session.commit()
+    return project
+
+
+@pytest.fixture(scope="function")
+def employee_with_skills(db_session, employee_user: User, skills: list) -> User:
+    """Create an employee with skills."""
+    # Add Python (level 4) and SQL (level 3)
+    us1 = UserSkill(
+        user_id=employee_user.id,
+        skill_id=skills[0].id,  # Python
+        proficiency_level=4,
+        is_verified=True,
+    )
+    us2 = UserSkill(
+        user_id=employee_user.id,
+        skill_id=skills[2].id,  # SQL
+        proficiency_level=3,
+        is_verified=False,
+    )
+    db_session.add_all([us1, us2])
+    db_session.commit()
+    return employee_user
+
+
+@pytest.fixture(scope="function")
+def assignment(db_session, project: Project, employee_user: User) -> ProjectAssignment:
+    """Create a project assignment for testing."""
+    assign = ProjectAssignment(
+        project_id=project.id,
+        user_id=employee_user.id,
+        role_in_project="Developer",
+        status="active",
+    )
+    db_session.add(assign)
+    db_session.commit()
+    return assign
+
+
+@pytest.fixture(scope="function")
+def learning_path(db_session, employee_user: User) -> LearningPath:
+    """Create a learning path for testing."""
+    import json
+    content = {
+        "target_role": "senior_developer",
+        "target_role_title": "Senior Developer",
+        "readiness_score": 60,
+        "recommendations": [
+            {"skill_name": "Docker", "priority": "high", "current_level": 0, "target_level": 3}
+        ],
+    }
+    path = LearningPath(
+        user_id=employee_user.id,
+        target_role="senior_developer",
+        generated_content=json.dumps(content),
+        status="active",
+    )
+    db_session.add(path)
+    db_session.commit()
+    return path

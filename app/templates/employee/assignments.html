@@ -1,0 +1,45 @@
+{% extends "employee/employee_base.html" %}
+{% block title %} – My Assignments{% endblock %}
+
+{% block employee_content %}
+<h1>My Project Assignments</h1>
+
+<p>
+    Filter by status:
+    <a href="{{ url_for('employee.list_assignments') }}">All</a> |
+    <a href="{{ url_for('employee.list_assignments', status='active') }}">Active</a> |
+    <a href="{{ url_for('employee.list_assignments', status='completed') }}">Completed</a> |
+    <a href="{{ url_for('employee.list_assignments', status='removed') }}">Removed</a>
+</p>
+
+{% if assignments %}
+<table border="1" cellpadding="8" style="width: 100%;">
+    <tr>
+        <th>Project</th>
+        <th>Description</th>
+        <th>Manager</th>
+        <th>Role</th>
+        <th>Project Status</th>
+        <th>Assigned Date</th>
+        <th>Actions</th>
+    </tr>
+    {% for assignment in assignments %}
+    <tr>
+        <td><a href="{{ url_for('employee.view_assignment', assignment_id=assignment.assignment_id) }}">{{
+                assignment.project_title }}</a></td>
+        <td>{{ assignment.project_description[:50] if assignment.project_description else '-' }}{{ '...' if
+            assignment.project_description and assignment.project_description|length > 50 else '' }}</td>
+        <td>{{ assignment.manager_name }}</td>
+        <td>{{ assignment.role_in_project or '-' }}</td>
+        <td>{{ assignment.project_status }}</td>
+        <td>{{ assignment.allotted_date.strftime('%Y-%m-%d') if assignment.allotted_date else '-' }}</td>
+        <td>
+            <a href="{{ url_for('employee.view_assignment', assignment_id=assignment.assignment_id) }}">View Details</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+<p>No assignments found.</p>
+{% endif %}
+{% endblock %}

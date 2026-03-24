@@ -7,8 +7,9 @@ and development helpers.
 
 Available commands:
     - seed-users: Generate fake users for testing
+    - seed-data: Seed departments, skills, and projects
 """
 
-from .seed_users import seed_users
+from .seed_users import seed_users, seed_data
 
-__all__ = ["seed_users"]
+__all__ = ["seed_users", "seed_data"]

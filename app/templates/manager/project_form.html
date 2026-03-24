@@ -1,0 +1,63 @@
+{% extends "manager/manager_base.html" %}
+{% block title %} – {{ 'Edit Project' if project else 'Create Project' }}{% endblock %}
+
+{% block manager_content %}
+<h1>{{ 'Edit Project' if project else 'Create New Project' }}</h1>
+
+<form method="POST" style="max-width: 600px;">
+    <p>
+        <label for="title"><strong>Title:</strong></label><br>
+        <input type="text" id="title" name="title" value="{{ project.title if project else '' }}" required
+            style="width: 100%; padding: 8px;">
+    </p>
+
+    <p>
+        <label for="description"><strong>Description:</strong></label><br>
+        <textarea id="description" name="description" rows="4"
+            style="width: 100%; padding: 8px;">{{ project.description if project else '' }}</textarea>
+    </p>
+
+    {% if project %}
+    <p>
+        <label for="status"><strong>Status:</strong></label><br>
+        <select id="status" name="status" style="padding: 8px;">
+            <option value="planning" {{ 'selected' if project.status=='planning' else '' }}>Planning</option>
+            <option value="active" {{ 'selected' if project.status=='active' else '' }}>Active</option>
+            <option value="completed" {{ 'selected' if project.status=='completed' else '' }}>Completed</option>
+            <option value="on_hold" {{ 'selected' if project.status=='on_hold' else '' }}>On Hold</option>
+        </select>
+    </p>
+    {% endif %}
+
+    <p>
+        <label for="start_date"><strong>Start Date:</strong></label><br>
+        <input type="date" id="start_date" name="start_date"
+            value="{{ project.start_date if project and project.start_date else '' }}" style="padding: 8px;">
+    </p>
+
+    <p>
+        <label for="end_date"><strong>End Date:</strong></label><br>
+        <input type="date" id="end_date" name="end_date"
+            value="{{ project.end_date if project and project.end_date else '' }}" style="padding: 8px;">
+    </p>
+
+    <p>
+        <button type="submit"
+            style="padding: 10px 20px; background: #007bff; color: white; border: none; cursor: pointer;">
+            {{ 'Update Project' if project else 'Create Project' }}
+        </button>
+        <a href="{{ url_for('manager.list_projects') }}" style="margin-left: 10px;">Cancel</a>
+    </p>
+</form>
+
+{% if project %}
+<hr>
+<h3>Danger Zone</h3>
+<form method="POST" action="{{ url_for('manager.delete_project', project_id=project.id) }}"
+    onsubmit="return confirm('Are you sure you want to delete this project?');">
+    <button type="submit" style="padding: 10px 20px; background: #dc3545; color: white; border: none; cursor: pointer;">
+        Delete Project
+    </button>
+</form>
+{% endif %}
+{% endblock %}

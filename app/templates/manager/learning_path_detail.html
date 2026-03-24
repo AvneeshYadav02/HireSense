@@ -1,0 +1,66 @@
+{% extends "manager/manager_base.html" %}
+{% block title %} – Learning Path Details{% endblock %}
+
+{% block manager_content %}
+<h1>Learning Path: {{ content.target_role_title or path.target_role }}</h1>
+
+<p><a href="{{ url_for('manager.learning_paths') }}">&larr; Back to Learning Paths</a></p>
+
+<table border="1" cellpadding="8">
+    <tr>
+        <td><strong>Target Role</strong></td>
+        <td>{{ content.target_role_title or path.target_role }}</td>
+    </tr>
+    <tr>
+        <td><strong>Status</strong></td>
+        <td>{{ path.status }}</td>
+    </tr>
+    <tr>
+        <td><strong>Readiness Score</strong></td>
+        <td>{{ content.readiness_score }}%</td>
+    </tr>
+    <tr>
+        <td><strong>Skills to Learn</strong></td>
+        <td>{{ content.total_skills_to_learn }}</td>
+    </tr>
+    <tr>
+        <td><strong>Skills to Improve</strong></td>
+        <td>{{ content.skills_to_improve }}</td>
+    </tr>
+    <tr>
+        <td><strong>Generated</strong></td>
+        <td>{{ path.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+    </tr>
+</table>
+
+<h2>Recommendations</h2>
+{% if content.recommendations %}
+<table border="1" cellpadding="8" style="width: 100%;">
+    <tr>
+        <th>Skill</th>
+        <th>Priority</th>
+        <th>Current Level</th>
+        <th>Target Level</th>
+        <th>Required</th>
+        <th>Resources</th>
+    </tr>
+    {% for rec in content.recommendations %}
+    <tr
+        style="{% if rec.priority == 'high' %}background-color: #f8d7da;{% elif rec.priority == 'medium' %}background-color: #fff3cd;{% else %}background-color: #d4edda;{% endif %}">
+        <td>{{ rec.skill_name }}</td>
+        <td>{{ rec.priority|upper }}</td>
+        <td>{{ rec.current_level }}/5</td>
+        <td>{{ rec.target_level }}/5</td>
+        <td>{{ 'Yes' if rec.is_required else 'No' }}</td>
+        <td>
+            {% for resource in rec.resources %}
+            <small>{{ resource.type }}: {{ resource.title }}</small><br>
+            {% endfor %}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+<p>No recommendations at this time.</p>
+{% endif %}
+{% endblock %}

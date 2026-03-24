@@ -1,0 +1,49 @@
+{% extends "manager/manager_base.html" %}
+{% block title %} – Learning Paths{% endblock %}
+
+{% block manager_content %}
+<h1>My Learning Paths</h1>
+
+<h2>Generate New Learning Path</h2>
+<form method="POST" action="{{ url_for('manager.generate_learning_path') }}">
+    <p>
+        <label for="target_role"><strong>Target Role:</strong></label><br>
+        <select id="target_role" name="target_role" required style="padding: 8px;">
+            <option value="">-- Select target role --</option>
+            {% for role in available_roles %}
+            <option value="{{ role.id }}">{{ role.title }}</option>
+            {% endfor %}
+        </select>
+    </p>
+    <p>
+        <button type="submit"
+            style="padding: 10px 20px; background: #007bff; color: white; border: none; cursor: pointer;">
+            Generate Learning Path
+        </button>
+    </p>
+</form>
+
+<h2>My Learning Paths ({{ paths|length }})</h2>
+{% if paths %}
+<table border="1" cellpadding="8" style="width: 100%;">
+    <tr>
+        <th>Target Role</th>
+        <th>Status</th>
+        <th>Created</th>
+        <th>Actions</th>
+    </tr>
+    {% for path in paths %}
+    <tr>
+        <td>{{ path.target_role }}</td>
+        <td>{{ path.status }}</td>
+        <td>{{ path.created_at.strftime('%Y-%m-%d') }}</td>
+        <td>
+            <a href="{{ url_for('manager.view_learning_path', path_id=path.id) }}">View Details</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+<p>No learning paths generated yet.</p>
+{% endif %}
+{% endblock %}

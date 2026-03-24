@@ -1,0 +1,61 @@
+{% extends "manager/manager_base.html" %}
+{% block title %} – Match Employees for {{ project.title }}{% endblock %}
+
+{% block manager_content %}
+<h1>Find Matching Employees: {{ project.title }}</h1>
+
+<p>
+    <a href="{{ url_for('manager.view_project', project_id=project.id) }}">&larr; Back to Project</a> |
+    <a href="{{ url_for('manager.project_team', project_id=project.id) }}">View Current Team</a>
+</p>
+
+<h2>Required Skills</h2>
+{% if skill_requirements %}
+<ul>
+    {% for skill in skill_requirements %}
+    <li>{{ skill.skill_name }} ({{ 'Mandatory' if skill.is_mandatory else 'Optional' }}, Level {{
+        skill.minimum_proficiency }}+)</li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>No skill requirements defined. <a href="{{ url_for('manager.project_skills', project_id=project.id) }}">Add skills
+        first</a></p>
+{% endif %}
+
+<h2>Matching Employees ({{ matches|length }})</h2>
+{% if matches %}
+<table border="1" cellpadding="8" style="width: 100%;">
+    <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Department</th>
+        <th>Match Score</th>
+        <th>Mandatory Met</th>
+        <th>Optional Matched</th>
+        <th>Actions</th>
+    </tr>
+    {% for match in matches %}
+    <tr style="{% if match.mandatory_met %}background-color: #d4edda;{% else %}background-color: #f8d7da;{% endif %}">
+        <td><a href="{{ url_for('manager.view_employee_skills', user_id=match.user_id) }}">{{ match.username }}</a></td>
+        <td>{{ match.email }}</td>
+        <td>{{ match.department or '-' }}</td>
+        <td>{{ match.match_score }}</td>
+        <td>{{ match.mandatory_count }}</td>
+        <td>{{ match.optional_matched }}/{{ match.optional_count }}</td>
+        <td>
+            <form method="POST" action="{{ url_for('manager.assign_employee', project_id=project.id) }}"
+                style="display: inline;">
+                <input type="hidden" name="user_id" value="{{ match.user_id }}">
+                <input type="text" name="role_in_project" placeholder="Role (optional)" style="width: 100px;">
+                <button type="submit">Assign</button>
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+<p><small>Green rows indicate all mandatory skills are met. Red rows indicate missing mandatory skills.</small></p>
+{% else %}
+<p>No employees available to assign.</p>
+{% endif %}
+{% endblock %}

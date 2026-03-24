@@ -1,0 +1,82 @@
+{% extends "manager/manager_base.html" %}
+{% block title %} – Skills for {{ project.title }}{% endblock %}
+
+{% block manager_content %}
+<h1>Skill Requirements: {{ project.title }}</h1>
+
+<p>
+    <a href="{{ url_for('manager.view_project', project_id=project.id) }}">&larr; Back to Project</a>
+</p>
+
+<h2>Current Requirements ({{ skill_requirements|length }})</h2>
+{% if skill_requirements %}
+<table border="1" cellpadding="8" style="width: 100%;">
+    <tr>
+        <th>Skill</th>
+        <th>Category</th>
+        <th>Mandatory</th>
+        <th>Min Level</th>
+        <th>Actions</th>
+    </tr>
+    {% for skill in skill_requirements %}
+    <tr>
+        <td>{{ skill.skill_name }}</td>
+        <td>{{ skill.category or '-' }}</td>
+        <td>{{ 'Yes' if skill.is_mandatory else 'No' }}</td>
+        <td>{{ skill.minimum_proficiency }}/5</td>
+        <td>
+            <form method="POST" action="{{ url_for('manager.remove_project_skill', project_id=project.id) }}"
+                style="display: inline;">
+                <input type="hidden" name="skill_id" value="{{ skill.skill_id }}">
+                <button type="submit" onclick="return confirm('Remove this skill?');">Remove</button>
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+<p>No skill requirements defined yet.</p>
+{% endif %}
+
+<h2>Add Skill Requirement</h2>
+{% if available_skills %}
+<form method="POST" action="{{ url_for('manager.add_project_skill', project_id=project.id) }}">
+    <p>
+        <label for="skill_id"><strong>Skill:</strong></label><br>
+        <select id="skill_id" name="skill_id" required style="padding: 8px;">
+            <option value="">-- Select a skill --</option>
+            {% for skill in available_skills %}
+            <option value="{{ skill.id }}">{{ skill.name }} ({{ skill.category or 'uncategorized' }})</option>
+            {% endfor %}
+        </select>
+    </p>
+
+    <p>
+        <label for="minimum_proficiency"><strong>Minimum Proficiency Level:</strong></label><br>
+        <select id="minimum_proficiency" name="minimum_proficiency" style="padding: 8px;">
+            <option value="1">1 - Beginner</option>
+            <option value="2">2 - Basic</option>
+            <option value="3" selected>3 - Intermediate</option>
+            <option value="4">4 - Advanced</option>
+            <option value="5">5 - Expert</option>
+        </select>
+    </p>
+
+    <p>
+        <label>
+            <input type="checkbox" name="is_mandatory" checked>
+            <strong>Mandatory skill</strong>
+        </label>
+    </p>
+
+    <p>
+        <button type="submit"
+            style="padding: 10px 20px; background: #007bff; color: white; border: none; cursor: pointer;">
+            Add Skill
+        </button>
+    </p>
+</form>
+{% else %}
+<p>No more skills available to add. All skills are already added to this project.</p>
+{% endif %}
+{% endblock %}

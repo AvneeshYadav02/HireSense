@@ -35,7 +35,6 @@ def seed_admin():
             db.session.commit()
 
 
-seed_admin()
-
 if __name__ == "__main__":
+    seed_admin()
     app.run(host="0.0.0.0", port=port, debug=os.environ.get("FLASK_DEBUG", "false") == "true")

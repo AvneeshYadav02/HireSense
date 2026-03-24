@@ -9,6 +9,7 @@ This document describes the utility scripts available in the `utility/` folder a
 - [Overview](#overview)
 - [Available Commands](#available-commands)
   - [seed-users](#seed-users)
+  - [seed-data](#seed-data)
 - [Usage](#usage)
 - [Adding New Utilities](#adding-new-utilities)
 
@@ -99,6 +100,68 @@ User Summary:
 - Duplicate emails are automatically skipped
 - All users are created as active (not blacklisted)
 - The command uses your configured database from `.env` or environment variables
+
+### seed-data
+
+Seed the database with departments, skills, projects, and optionally user skills and assignments.
+
+**File:** `utility/seed_users.py`
+
+**Usage:**
+
+```bash
+# Basic seed (departments, skills, sample projects)
+flask seed-data
+
+# Full seed (includes user skills and project assignments)
+flask seed-data --full
+
+# Show help
+flask seed-data --help
+```
+
+**Options:**
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `--full` | No | Include user skills and project assignments |
+
+**What Gets Seeded:**
+
+**Basic mode (`flask seed-data`):**
+- Departments: Engineering, QA, Security, Data Science, DevOps, Product Management
+- Skills: 40+ technical and soft skills (Python, JavaScript, Docker, AWS, etc.)
+- Sample projects: 5 projects with skill requirements and random manager assignments
+
+**Full mode (`flask seed-data --full`):**
+- All of the above
+- User skills: Random skills assigned to up to 20 employees
+- Project assignments: Random employees assigned to active projects
+
+**Output Example:**
+
+```
+$ flask seed-data --full
+Seeding departments, skills, and projects...
+  Created department: Engineering
+  Created department: Quality Assurance
+  ...
+Departments: 6 total
+Skills: 40 total
+  Created project: API Platform Upgrade (Manager: jsmith)
+  ...
+Projects: 5 total
+User skills: 87 total
+Project assignments: 15 total
+
+Seed data complete!
+```
+
+**Notes:**
+
+- Requires existing users (run `flask seed-users` first)
+- Safe to run multiple times (skips existing data)
+- Projects are assigned to random approved managers
 
 ---
 

@@ -1,0 +1,54 @@
+{% extends "manager/manager_base.html" %}
+{% block title %} – Projects{% endblock %}
+
+{% block manager_content %}
+<h1>My Projects</h1>
+
+<p>
+    <a href="{{ url_for('manager.create_project') }}"
+        style="padding: 8px 16px; background: #007bff; color: white; text-decoration: none;">Create New Project</a>
+</p>
+
+<p>
+    Filter by status:
+    <a href="{{ url_for('manager.list_projects') }}">All</a> |
+    <a href="{{ url_for('manager.list_projects', status='planning') }}">Planning</a> |
+    <a href="{{ url_for('manager.list_projects', status='active') }}">Active</a> |
+    <a href="{{ url_for('manager.list_projects', status='completed') }}">Completed</a> |
+    <a href="{{ url_for('manager.list_projects', status='on_hold') }}">On Hold</a>
+</p>
+
+{% if projects %}
+<table border="1" cellpadding="8" style="width: 100%;">
+    <tr>
+        <th>Title</th>
+        <th>Description</th>
+        <th>Status</th>
+        <th>Start Date</th>
+        <th>End Date</th>
+        <th>Team Size</th>
+        <th>Actions</th>
+    </tr>
+    {% for project in projects %}
+    <tr>
+        <td>{{ project.title }}</td>
+        <td>{{ project.description[:50] if project.description else '-' }}{{ '...' if project.description and
+            project.description|length > 50 else '' }}</td>
+        <td>{{ project.status }}</td>
+        <td>{{ project.start_date if project.start_date else '-' }}</td>
+        <td>{{ project.end_date if project.end_date else '-' }}</td>
+        <td>{{ project.assignments.filter_by(status='active').count() }}</td>
+        <td>
+            <a href="{{ url_for('manager.view_project', project_id=project.id) }}">View</a> |
+            <a href="{{ url_for('manager.edit_project', project_id=project.id) }}">Edit</a> |
+            <a href="{{ url_for('manager.project_skills', project_id=project.id) }}">Skills</a> |
+            <a href="{{ url_for('manager.match_employees', project_id=project.id) }}">Match</a> |
+            <a href="{{ url_for('manager.project_team', project_id=project.id) }}">Team</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+<p>No projects found. <a href="{{ url_for('manager.create_project') }}">Create your first project</a></p>
+{% endif %}
+{% endblock %}

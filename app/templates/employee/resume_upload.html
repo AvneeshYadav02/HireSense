@@ -1,0 +1,26 @@
+{% extends "employee/employee_base.html" %}
+{% block title %} – Upload Resume{% endblock %}
+
+{% block employee_content %}
+<h1>Upload Resume</h1>
+
+<form method="POST" action="{{ url_for('employee.upload_resume') }}" enctype="multipart/form-data">
+    <p>
+        <label for="resume_file"><strong>Select Resume File</strong></label><br>
+        <input type="file" id="resume_file" name="resume_file" accept=".pdf,.doc,.docx" required>
+    </p>
+    <p>
+        <small>Supported formats: PDF, DOC, DOCX</small>
+    </p>
+    <p>
+        <button type="submit"
+            style="padding: 10px 20px; background: #28a745; color: white; border: none; cursor: pointer;">
+            Upload Resume
+        </button>
+        <a href="{{ url_for('employee.view_resume') }}"
+            style="padding: 10px 20px; background: #6c757d; color: white; text-decoration: none; display: inline-block;">
+            Cancel
+        </a>
+    </p>
+</form>
+{% endblock %}

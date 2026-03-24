@@ -84,3 +84,206 @@ def seed_users(number: int, approved: bool, role: str):
     click.echo(f"  - Pending: {User.query.filter_by(is_approved=False).count()}")
     click.echo(f"  - Managers: {User.query.filter_by(role='manager').count()}")
     click.echo(f"  - Employees: {User.query.filter_by(role='employee').count()}")
+
+
+@click.command("seed-data")
+@click.option("--full", is_flag=True, help="Include user skills and project assignments")
+@with_appcontext
+def seed_data(full: bool):
+    """
+    Seed the database with departments, skills, and sample projects.
+
+    This populates the system with test data for Manager and Employee features.
+    """
+    from app import db
+    from app.models import Department, Skill, User, Project, ProjectSkill, UserSkill, ProjectAssignment
+
+    click.echo("Seeding departments, skills, and projects...")
+
+    # Seed departments
+    departments_data = [
+        "Engineering",
+        "Quality Assurance",
+        "Security",
+        "Data Science",
+        "DevOps",
+        "Product Management",
+    ]
+
+    departments = {}
+    for name in departments_data:
+        existing = Department.query.filter_by(name=name).first()
+        if not existing:
+            dept = Department(name=name)
+            db.session.add(dept)
+            departments[name] = dept
+            click.echo(f"  Created department: {name}")
+        else:
+            departments[name] = existing
+
+    db.session.commit()
+    click.echo(click.style(f"Departments: {Department.query.count()} total", fg="green"))
+
+    # Seed skills
+    skills_data = [
+        ("Python", "technical"),
+        ("JavaScript", "technical"),
+        ("TypeScript", "technical"),
+        ("SQL", "technical"),
+        ("PostgreSQL", "technical"),
+        ("Docker", "technical"),
+        ("Kubernetes", "technical"),
+        ("AWS", "technical"),
+        ("Git", "technical"),
+        ("Linux", "technical"),
+        ("CI/CD", "technical"),
+        ("Flask", "technical"),
+        ("Django", "technical"),
+        ("React", "technical"),
+        ("Node.js", "technical"),
+        ("Machine Learning", "technical"),
+        ("Deep Learning", "technical"),
+        ("NLP", "technical"),
+        ("Statistics", "technical"),
+        ("Data Visualization", "technical"),
+        ("Testing", "technical"),
+        ("Automation", "technical"),
+        ("Selenium", "technical"),
+        ("API Testing", "technical"),
+        ("Performance Testing", "technical"),
+        ("Cybersecurity", "technical"),
+        ("Network Security", "technical"),
+        ("Penetration Testing", "technical"),
+        ("SIEM", "technical"),
+        ("Compliance", "technical"),
+        ("Terraform", "technical"),
+        ("Ansible", "technical"),
+        ("Monitoring", "technical"),
+        ("System Design", "technical"),
+        ("Communication", "soft"),
+        ("Project Management", "soft"),
+        ("Agile", "soft"),
+        ("Mentoring", "soft"),
+        ("Code Review", "soft"),
+        ("Problem Solving", "soft"),
+    ]
+
+    skills = {}
+    for name, category in skills_data:
+        existing = Skill.query.filter_by(name=name).first()
+        if not existing:
+            skill = Skill(name=name, category=category)
+            db.session.add(skill)
+            skills[name] = skill
+        else:
+            skills[name] = existing
+
+    db.session.commit()
+    click.echo(click.style(f"Skills: {Skill.query.count()} total", fg="green"))
+
+    # Assign departments to employees without departments
+    employees_without_dept = User.query.filter(
+        User.role.in_(["employee", "manager"]),
+        User.department_id.is_(None)
+    ).all()
+
+    dept_list = list(departments.values())
+    if dept_list and employees_without_dept:
+        import random
+        for user in employees_without_dept:
+            user.department_id = random.choice(dept_list).id
+        db.session.commit()
+        click.echo(f"Assigned departments to {len(employees_without_dept)} users")
+
+    # Create sample projects (if managers exist)
+    managers = User.query.filter_by(role="manager", is_approved=True, is_active=True).all()
+    if managers:
+        projects_data = [
+            ("API Platform Upgrade", "Modernize the API platform with new authentication", ["Python", "Flask", "Docker", "PostgreSQL"]),
+            ("Mobile App Backend", "Backend services for mobile application", ["Python", "AWS", "PostgreSQL", "Git"]),
+            ("Data Pipeline Project", "Build ETL pipelines for analytics", ["Python", "SQL", "AWS", "Docker"]),
+            ("Security Audit System", "Automated security scanning and auditing", ["Python", "Cybersecurity", "Docker", "Linux"]),
+            ("ML Model Deployment", "Deploy ML models to production", ["Python", "Machine Learning", "Docker", "AWS"]),
+        ]
+
+        import random
+        for title, description, req_skills in projects_data:
+            existing = Project.query.filter_by(title=title).first()
+            if not existing:
+                manager = random.choice(managers)
+                project = Project(
+                    title=title,
+                    description=description,
+                    status=random.choice(["planning", "active"]),
+                    manager_id=manager.id,
+                )
+                db.session.add(project)
+                db.session.flush()  # Get project ID
+
+                # Add skill requirements
+                for skill_name in req_skills:
+                    if skill_name in skills:
+                        ps = ProjectSkill(
+                            project_id=project.id,
+                            skill_id=skills[skill_name].id,
+                            is_mandatory=random.choice([True, True, False]),
+                            minimum_proficiency=random.randint(2, 4),
+                        )
+                        db.session.add(ps)
+                click.echo(f"  Created project: {title} (Manager: {manager.username})")
+
+        db.session.commit()
+        click.echo(click.style(f"Projects: {Project.query.count()} total", fg="green"))
+
+    if full:
+        # Assign random skills to employees
+        employees = User.query.filter_by(role="employee", is_approved=True, is_active=True).all()
+        skill_list = list(skills.values())
+
+        import random
+        for employee in employees[:20]:  # Limit to first 20 for performance
+            # Give each employee 3-7 random skills
+            num_skills = random.randint(3, 7)
+            chosen_skills = random.sample(skill_list, min(num_skills, len(skill_list)))
+
+            for skill in chosen_skills:
+                existing = UserSkill.query.filter_by(user_id=employee.id, skill_id=skill.id).first()
+                if not existing:
+                    us = UserSkill(
+                        user_id=employee.id,
+                        skill_id=skill.id,
+                        proficiency_level=random.randint(1, 5),
+                        is_verified=random.choice([True, False]),
+                    )
+                    db.session.add(us)
+
+        db.session.commit()
+        click.echo(click.style(f"User skills: {UserSkill.query.count()} total", fg="green"))
+
+        # Create some project assignments
+        projects = Project.query.filter_by(status="active").all()
+        employees = User.query.filter_by(role="employee", is_approved=True, is_active=True).all()
+
+        if projects and employees:
+            for project in projects:
+                # Assign 2-4 employees to each project
+                num_assignments = min(random.randint(2, 4), len(employees))
+                chosen_employees = random.sample(employees, num_assignments)
+
+                for emp in chosen_employees:
+                    existing = ProjectAssignment.query.filter_by(
+                        project_id=project.id, user_id=emp.id
+                    ).first()
+                    if not existing:
+                        pa = ProjectAssignment(
+                            project_id=project.id,
+                            user_id=emp.id,
+                            role_in_project=random.choice(["Developer", "Lead", "Analyst", "Tester"]),
+                            status="active",
+                        )
+                        db.session.add(pa)
+
+            db.session.commit()
+            click.echo(click.style(f"Project assignments: {ProjectAssignment.query.count()} total", fg="green"))
+
+    click.echo(click.style("\nSeed data complete!", fg="green"))

@@ -1,0 +1,82 @@
+{% extends "manager/manager_base.html" %}
+{% block title %} – Compare Roles{% endblock %}
+
+{% block manager_content %}
+<h1>Compare with Target Role</h1>
+
+<form method="GET" action="{{ url_for('manager.compare_roles') }}">
+    <p>
+        <label for="target_role"><strong>Select Target Role:</strong></label><br>
+        <select id="target_role" name="target_role" style="padding: 8px;">
+            <option value="">-- Select role --</option>
+            {% for role in available_roles %}
+            <option value="{{ role.id }}" {{ 'selected' if selected_role==role.id else '' }}>{{ role.title }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit" style="padding: 8px 16px;">Compare</button>
+    </p>
+</form>
+
+{% if comparison %}
+<h2>Comparison Results</h2>
+
+<table border="1" cellpadding="10">
+    <tr>
+        <td><strong>Current Role</strong></td>
+        <td>{{ comparison.current_role }}</td>
+    </tr>
+    <tr>
+        <td><strong>Target Role</strong></td>
+        <td>{{ comparison.target_role_title }}</td>
+    </tr>
+    <tr>
+        <td><strong>Readiness Score</strong></td>
+        <td>{{ comparison.readiness_score }}%</td>
+    </tr>
+    <tr>
+        <td><strong>Estimated Time</strong></td>
+        <td>{{ comparison.estimated_time_to_ready }}</td>
+    </tr>
+</table>
+
+<h3>Required Skills</h3>
+<p>Met: {{ comparison.required_skills.met }}/{{ comparison.required_skills.total }}</p>
+
+{% if comparison.required_skills.met_list %}
+<h4>Skills You Have</h4>
+<ul>
+    {% for skill in comparison.required_skills.met_list %}
+    <li>{{ skill.skill_name }} (Level {{ skill.proficiency }}/5)</li>
+    {% endfor %}
+</ul>
+{% endif %}
+
+{% if comparison.required_skills.missing_list %}
+<h4>Skills You Need</h4>
+<ul style="color: red;">
+    {% for skill in comparison.required_skills.missing_list %}
+    <li>{{ skill }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+
+<h3>Recommended Skills</h3>
+<p>Met: {{ comparison.recommended_skills.met }}/{{ comparison.recommended_skills.total }}</p>
+
+{% if comparison.recommended_skills.missing_list %}
+<h4>Nice to Have</h4>
+<ul>
+    {% for skill in comparison.recommended_skills.missing_list %}
+    <li>{{ skill }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+
+<p>
+    <a href="{{ url_for('manager.learning_paths') }}"
+        style="padding: 10px 20px; background: #007bff; color: white; text-decoration: none; display: inline-block; margin-top: 15px;">
+        Generate Learning Path for {{ comparison.target_role_title }}
+    </a>
+</p>
+{% endif %}
+{% endblock %}

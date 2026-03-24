@@ -1,37 +1,35 @@
 {% extends "employee/employee_base.html" %}
-{% block title %} – Employee Dashboard{% endblock %}
+{% block title %} – My Profile{% endblock %}
 
 {% block employee_content %}
-<h1>Employee Dashboard</h1>
-<p>Welcome, {{ current_user.username }}.</p>
+<h1>My Profile</h1>
 
-<h2>My Assignments ({{ assignments|length }} active)</h2>
-{% if assignments %}
-<table border="1" cellpadding="8" style="width: 100%;">
+<table border="1" cellpadding="10">
     <tr>
-        <th>Project</th>
-        <th>Manager</th>
-        <th>Role</th>
-        <th>Status</th>
-        <th>Assigned</th>
+        <td><strong>Username</strong></td>
+        <td>{{ user.username }}</td>
     </tr>
-    {% for assignment in assignments[:5] %}
     <tr>
-        <td><a href="{{ url_for('employee.view_assignment', assignment_id=assignment.assignment_id) }}">{{
-                assignment.project_title }}</a></td>
-        <td>{{ assignment.manager_name }}</td>
-        <td>{{ assignment.role_in_project or '-' }}</td>
-        <td>{{ assignment.project_status }}</td>
-        <td>{{ assignment.allotted_date.strftime('%Y-%m-%d') if assignment.allotted_date else '-' }}</td>
+        <td><strong>Email</strong></td>
+        <td>{{ user.email }}</td>
     </tr>
-    {% endfor %}
+    <tr>
+        <td><strong>Role</strong></td>
+        <td>{{ user.role }}</td>
+    </tr>
+    <tr>
+        <td><strong>Department</strong></td>
+        <td>{{ user.department.name if user.department else 'Not assigned' }}</td>
+    </tr>
+    <tr>
+        <td><strong>Job Title</strong></td>
+        <td>{{ user.job_title or 'Not set' }}</td>
+    </tr>
+    <tr>
+        <td><strong>Member Since</strong></td>
+        <td>{{ user.created_at.strftime('%Y-%m-%d') }}</td>
+    </tr>
 </table>
-{% if assignments|length > 5 %}
-<p><a href="{{ url_for('employee.list_assignments') }}">View all assignments...</a></p>
-{% endif %}
-{% else %}
-<p>No active project assignments.</p>
-{% endif %}
 
 <h2>My Skills ({{ skills|length }})</h2>
 {% if skills %}

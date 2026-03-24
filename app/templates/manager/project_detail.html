@@ -1,0 +1,94 @@
+{% extends "manager/manager_base.html" %}
+{% block title %} – {{ project.title }}{% endblock %}
+
+{% block manager_content %}
+<h1>{{ project.title }}</h1>
+
+<p>
+    <a href="{{ url_for('manager.list_projects') }}">&larr; Back to Projects</a> |
+    <a href="{{ url_for('manager.edit_project', project_id=project.id) }}">Edit</a> |
+    <a href="{{ url_for('manager.project_skills', project_id=project.id) }}">Manage Skills</a> |
+    <a href="{{ url_for('manager.match_employees', project_id=project.id) }}">Find Employees</a> |
+    <a href="{{ url_for('manager.project_team', project_id=project.id) }}">View Team</a>
+</p>
+
+<table border="1" cellpadding="8">
+    <tr>
+        <td><strong>Status</strong></td>
+        <td>{{ project.status }}</td>
+    </tr>
+    <tr>
+        <td><strong>Description</strong></td>
+        <td>{{ project.description or 'No description' }}</td>
+    </tr>
+    <tr>
+        <td><strong>Start Date</strong></td>
+        <td>{{ project.start_date or 'Not set' }}</td>
+    </tr>
+    <tr>
+        <td><strong>End Date</strong></td>
+        <td>{{ project.end_date or 'Not set' }}</td>
+    </tr>
+    <tr>
+        <td><strong>Created</strong></td>
+        <td>{{ project.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+    </tr>
+</table>
+
+<h2>Required Skills ({{ skill_requirements|length }})</h2>
+{% if skill_requirements %}
+<table border="1" cellpadding="8">
+    <tr>
+        <th>Skill</th>
+        <th>Category</th>
+        <th>Mandatory</th>
+        <th>Min Level</th>
+    </tr>
+    {% for skill in skill_requirements %}
+    <tr>
+        <td>{{ skill.skill_name }}</td>
+        <td>{{ skill.category or '-' }}</td>
+        <td>{{ 'Yes' if skill.is_mandatory else 'No' }}</td>
+        <td>{{ skill.minimum_proficiency }}/5</td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+<p>No skill requirements defined. <a href="{{ url_for('manager.project_skills', project_id=project.id) }}">Add
+        skills</a></p>
+{% endif %}
+
+<h2>Team Members ({{ team|length }})</h2>
+{% if team %}
+<table border="1" cellpadding="8">
+    <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Department</th>
+        <th>Role in Project</th>
+        <th>Assigned</th>
+        <th>Actions</th>
+    </tr>
+    {% for member in team %}
+    <tr>
+        <td><a href="{{ url_for('manager.view_employee_skills', user_id=member.user_id) }}">{{ member.username }}</a>
+        </td>
+        <td>{{ member.email }}</td>
+        <td>{{ member.department or '-' }}</td>
+        <td>{{ member.role_in_project or '-' }}</td>
+        <td>{{ member.allotted_date.strftime('%Y-%m-%d') if member.allotted_date else '-' }}</td>
+        <td>
+            <form method="POST"
+                action="{{ url_for('manager.unassign_employee', project_id=project.id, user_id=member.user_id) }}"
+                style="display: inline;">
+                <button type="submit" onclick="return confirm('Remove this employee?');">Remove</button>
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+<p>No team members assigned. <a href="{{ url_for('manager.match_employees', project_id=project.id) }}">Find matching
+        employees</a></p>
+{% endif %}
+{% endblock %}

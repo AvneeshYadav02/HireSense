@@ -1,0 +1,63 @@
+{% extends "employee/employee_base.html" %}
+{% block title %} – My Resume{% endblock %}
+
+{% block employee_content %}
+<h1>My Resume</h1>
+
+{% if resume %}
+<h2>Current Resume</h2>
+<table border="1" cellpadding="8">
+    <tr>
+        <td><strong>File Name</strong></td>
+        <td>{{ resume.original_filename or 'Resume' }}</td>
+    </tr>
+    <tr>
+        <td><strong>Last Updated</strong></td>
+        <td>{{ resume.last_updated.strftime('%Y-%m-%d %H:%M') if resume.last_updated else '-' }}</td>
+    </tr>
+</table>
+
+<p>
+    <a href="{{ url_for('employee.download_resume') }}"
+        style="padding: 8px 16px; background: #007bff; color: white; text-decoration: none;">Download</a>
+</p>
+
+<h2>Update Resume</h2>
+<form method="POST" action="{{ url_for('employee.upload_resume') }}" enctype="multipart/form-data">
+    <p>
+        <input type="file" name="resume_file" accept=".pdf,.doc,.docx" required>
+    </p>
+    <p>
+        <button type="submit"
+            style="padding: 10px 20px; background: #28a745; color: white; border: none; cursor: pointer;">
+            Upload New Resume
+        </button>
+    </p>
+</form>
+
+<h2>Delete Resume</h2>
+<form method="POST" action="{{ url_for('employee.delete_resume') }}"
+    onsubmit="return confirm('Are you sure you want to delete your resume?');">
+    <button type="submit" style="padding: 10px 20px; background: #dc3545; color: white; border: none; cursor: pointer;">
+        Delete Resume
+    </button>
+</form>
+
+{% else %}
+<h2>Upload Resume</h2>
+<p>You haven't uploaded a resume yet.</p>
+<form method="POST" action="{{ url_for('employee.upload_resume') }}" enctype="multipart/form-data">
+    <p>
+        <label for="resume_file"><strong>Select file:</strong></label><br>
+        <input type="file" id="resume_file" name="resume_file" accept=".pdf,.doc,.docx" required>
+    </p>
+    <p><small>Allowed formats: PDF, DOC, DOCX</small></p>
+    <p>
+        <button type="submit"
+            style="padding: 10px 20px; background: #007bff; color: white; border: none; cursor: pointer;">
+            Upload Resume
+        </button>
+    </p>
+</form>
+{% endif %}
+{% endblock %}

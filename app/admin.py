@@ -47,6 +47,7 @@ def inject_notifications():
 @admin_bp.route("/")
 @admin_required
 def dashboard():
+    print("DASHBOARD FUNCTION IS BEING EXECUTED!")
     search_query = request.args.get("q", "").strip()
     
     query = User.query.filter_by(is_approved=False, is_blacklisted=False)

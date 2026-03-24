@@ -1,0 +1,90 @@
+{% extends "employee/employee_base.html" %}
+{% block title %} – Assignment Details{% endblock %}
+
+{% block employee_content %}
+<h1>Assignment: {{ assignment.project.title }}</h1>
+
+<p><a href="{{ url_for('employee.list_assignments') }}">&larr; Back to Assignments</a></p>
+
+<h2>Project Details</h2>
+<table border="1" cellpadding="8">
+    <tr>
+        <td><strong>Project Title</strong></td>
+        <td>{{ assignment.project.title }}</td>
+    </tr>
+    <tr>
+        <td><strong>Description</strong></td>
+        <td>{{ assignment.project.description or 'No description' }}</td>
+    </tr>
+    <tr>
+        <td><strong>Project Status</strong></td>
+        <td>{{ assignment.project.status }}</td>
+    </tr>
+    <tr>
+        <td><strong>Manager</strong></td>
+        <td>{{ assignment.project.manager.username }}</td>
+    </tr>
+    <tr>
+        <td><strong>Start Date</strong></td>
+        <td>{{ assignment.project.start_date or 'Not set' }}</td>
+    </tr>
+    <tr>
+        <td><strong>End Date</strong></td>
+        <td>{{ assignment.project.end_date or 'Not set' }}</td>
+    </tr>
+</table>
+
+<h2>My Assignment Details</h2>
+<table border="1" cellpadding="8">
+    <tr>
+        <td><strong>Role in Project</strong></td>
+        <td>{{ assignment.role_in_project or 'Not specified' }}</td>
+    </tr>
+    <tr>
+        <td><strong>Assignment Status</strong></td>
+        <td>{{ assignment.status }}</td>
+    </tr>
+    <tr>
+        <td><strong>Assigned Date</strong></td>
+        <td>{{ assignment.allotted_date.strftime('%Y-%m-%d %H:%M') if assignment.allotted_date else '-' }}</td>
+    </tr>
+</table>
+
+<h2>Required Skills</h2>
+{% if skill_requirements %}
+<table border="1" cellpadding="8" style="width: 100%;">
+    <tr>
+        <th>Skill</th>
+        <th>Category</th>
+        <th>Required Level</th>
+        <th>Mandatory</th>
+        <th>Your Level</th>
+        <th>Status</th>
+    </tr>
+    {% for skill in skill_requirements %}
+    {% set has_skill = skill.skill_id in my_skill_ids %}
+    {% set my_skill = my_skills|selectattr('skill_id', 'equalto', skill.skill_id)|first if has_skill else None %}
+    <tr
+        style="{% if has_skill and my_skill.proficiency_level >= skill.minimum_proficiency %}background-color: #d4edda;{% elif skill.is_mandatory %}background-color: #f8d7da;{% else %}background-color: #fff3cd;{% endif %}">
+        <td>{{ skill.skill_name }}</td>
+        <td>{{ skill.category or '-' }}</td>
+        <td>{{ skill.minimum_proficiency }}/5</td>
+        <td>{{ 'Yes' if skill.is_mandatory else 'No' }}</td>
+        <td>{{ my_skill.proficiency_level if my_skill else '0' }}/5</td>
+        <td>
+            {% if has_skill and my_skill.proficiency_level >= skill.minimum_proficiency %}
+            Met
+            {% elif has_skill %}
+            Needs improvement
+            {% else %}
+            Missing
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+<p><small>Green = requirement met, Red = mandatory missing, Yellow = optional missing</small></p>
+{% else %}
+<p>No specific skill requirements for this project.</p>
+{% endif %}
+{% endblock %}

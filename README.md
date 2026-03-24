@@ -71,6 +71,31 @@ Three roles: **admin**, **manager**, **employee**.
 
 Logging in on port 5010 does not affect sessions on 5011 or 5012.
 
+### Manager Features
+
+Managers can:
+- Create and manage projects with skill requirements
+- View project skill dependencies
+- Match employees to projects based on skill analysis
+- Assign/unassign employees to projects
+- Monitor employee skill and resume updates
+- Verify employee skills
+- Access self-service career development (learning paths, role comparison)
+
+See [docs/MANAGER_FEATURES.md](docs/MANAGER_FEATURES.md) for details.
+
+### Employee Features
+
+Employees can:
+- View assigned projects and requirements
+- Upload and manage resumes
+- Add, update, and remove skills
+- Compare current profile with target roles
+- Generate personalized learning paths
+- Track career development progress
+
+See [docs/EMPLOYEE_FEATURES.md](docs/EMPLOYEE_FEATURES.md) for details.
+
 ---
 
 ## Frontend Styling
@@ -264,6 +289,24 @@ docker compose exec app_5010 flask seed-users
 ```
 
 For more details, see [docs/UTILITY.md](docs/UTILITY.md).
+
+### Seeding Test Data
+
+Seed departments, skills, and sample projects:
+
+```bash
+# Basic seed (departments, skills, projects)
+flask seed-data
+
+# Full seed (includes user skills and assignments)
+flask seed-data --full
+```
+
+**Docker usage:**
+
+```bash
+docker compose exec app_5010 flask seed-data --full
+```
 
 ---
 

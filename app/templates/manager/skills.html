@@ -1,0 +1,79 @@
+{% extends "manager/manager_base.html" %}
+{% block title %} – My Skills{% endblock %}
+
+{% block manager_content %}
+<h1>My Skills</h1>
+
+<h2>Current Skills ({{ skills|length }})</h2>
+{% if skills %}
+<table border="1" cellpadding="8" style="width: 100%;">
+    <tr>
+        <th>Skill</th>
+        <th>Category</th>
+        <th>Proficiency</th>
+        <th>Verified</th>
+        <th>Actions</th>
+    </tr>
+    {% for skill in skills %}
+    <tr>
+        <td>{{ skill.skill_name }}</td>
+        <td>{{ skill.category or '-' }}</td>
+        <td>
+            <form method="POST" action="{{ url_for('manager.update_my_skill') }}" style="display: inline;">
+                <input type="hidden" name="skill_id" value="{{ skill.skill_id }}">
+                <select name="proficiency_level" onchange="this.form.submit()">
+                    {% for i in range(1, 6) %}
+                    <option value="{{ i }}" {{ 'selected' if skill.proficiency_level==i else '' }}>{{ i }}/5</option>
+                    {% endfor %}
+                </select>
+            </form>
+        </td>
+        <td>{{ 'Yes' if skill.is_verified else 'No' }}</td>
+        <td>
+            <form method="POST" action="{{ url_for('manager.remove_my_skill') }}" style="display: inline;">
+                <input type="hidden" name="skill_id" value="{{ skill.skill_id }}">
+                <button type="submit" onclick="return confirm('Remove this skill?');">Remove</button>
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+<p>No skills added yet.</p>
+{% endif %}
+
+<h2>Add New Skill</h2>
+{% if available_skills %}
+<form method="POST" action="{{ url_for('manager.add_my_skill') }}">
+    <p>
+        <label for="skill_id"><strong>Skill:</strong></label><br>
+        <select id="skill_id" name="skill_id" required style="padding: 8px;">
+            <option value="">-- Select a skill --</option>
+            {% for skill in available_skills %}
+            <option value="{{ skill.id }}">{{ skill.name }} ({{ skill.category or 'uncategorized' }})</option>
+            {% endfor %}
+        </select>
+    </p>
+
+    <p>
+        <label for="proficiency_level"><strong>Proficiency Level:</strong></label><br>
+        <select id="proficiency_level" name="proficiency_level" style="padding: 8px;">
+            <option value="1">1 - Beginner</option>
+            <option value="2">2 - Basic</option>
+            <option value="3" selected>3 - Intermediate</option>
+            <option value="4">4 - Advanced</option>
+            <option value="5">5 - Expert</option>
+        </select>
+    </p>
+
+    <p>
+        <button type="submit"
+            style="padding: 10px 20px; background: #007bff; color: white; border: none; cursor: pointer;">
+            Add Skill
+        </button>
+    </p>
+</form>
+{% else %}
+<p>All available skills have been added to your profile.</p>
+{% endif %}
+{% endblock %}
